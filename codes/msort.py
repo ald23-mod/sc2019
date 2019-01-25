@@ -32,7 +32,7 @@ def merge(L,R):
 
 def mergesort(X):
     """Given a unsorted list, sort list using
-    merge sort algorithm and return sorted list
+    merges sort algorithm and return sorted list
     """
 
     n = len(X)
