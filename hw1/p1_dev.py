@@ -1,5 +1,5 @@
 """M345SC Homework 1, part 1
-Your name and CID here
+Anas Lasri Doukkali and CID:01209387
 """
 
 def ksearch(S,k,f,x):

@@ -1,5 +1,5 @@
 """M345SC Homework 1, part 2
-Your name and CID here
+Anas Lasri and CID:01209387
 """
 
 def nsearch(L,P,target):
