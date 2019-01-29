@@ -22,13 +22,29 @@ def ksearch(S,k,f,x):
 
     Discussion: Add analysis here
     """
+    #I now need to define code that will find all k(function input parameter)
+    #-mers that occur at least f(function input parameter) times.
+    #The return of this first calculation should be the location of these 
+    #k-mers as well as the k-mers themselves.
+
+    k_mers = {}                            #List containing result above
+
+    for i in range(len(S)-k+1):       #Looping through the initial string
+        k_mer = S[i:i+k]
+        if k_mer not in k_mers:
+            k_mers[k_mer] = 1
+        else:
+            k_mers[k_mer] += 1
+    return k_mers
+
+    
 
 
 
 
     L1,L2,L3=[],[],[]
 
-    return L1,L2,L3
+    return L1,L2,L3, count_mer
 
 
 
