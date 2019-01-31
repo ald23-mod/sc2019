@@ -3,17 +3,12 @@ Anas Lasri Doukkali and CID:01209387
 """
 import numpy as np
 import time
+import matplotlib.pyplot as plt
 nucleo = ['A','T','C','G']
 def generate(N):
     seq = ''.join(list(np.random.choice(nucleo,N)))
     return seq
 
-
-def findDuplicates(list1,list2):
-    count  = []
-    for each in list2:
-        count.append(list1.count(each) - len(L2))
-    return count
 
 #def common_elements(list1,list2):
 #    result = []
@@ -96,9 +91,22 @@ def ksearch(S,k,f,x):
     L1,L2,L3 = list(final.keys()),list(final.values()),count
     return L1,L2,L3
 
+#-------------------------Part1.3/Analyze-----------------------------------
+#In this part I will produce plots.
+def analyze(k,f,x):
+    final_dt = []
+    size = []
+    for  i in range(1000,20000,100):
+        dt = []
+        size.append(i)
+        for j in range(20):
+            t1 = time.time()
+            dummy = ksearch(generate(i),k,f,x)
+            t2 = time.time()
+            dt.append(t2-t1)
+        final_dt.append(sum(dt)/len(dt))
 
-
-
+    plt.plot(size[:],final_dt[:])
 
 if __name__=='__main__':
     #Sample input and function call. Use/modify if/as needed
