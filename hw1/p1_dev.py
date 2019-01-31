@@ -1,16 +1,29 @@
 """M345SC Homework 1, part 1
 Anas Lasri Doukkali and CID:01209387
 """
+import numpy as np
+import time
+nucleo = ['A','T','C','G']
+def generate(N):
+    seq = ''.join(list(np.random.choice(nucleo,N)))
+    return seq
 
-def common_elements(list1,list2):
-    result = []
-    for i in list1:
-        mutation_count = 0
-        for j in list2:
-            if j == i:
-                mutation_count += 1
-        result.append(mutation_count)
-    return result
+
+def findDuplicates(list1,list2):
+    count  = []
+    for each in list2:
+        count.append(list1.count(each) - len(L2))
+    return count
+
+#def common_elements(list1,list2):
+#    result = []
+#    for i in list1:
+#        mutation_count = 0
+#        for j in list2:
+#            if j == i:
+#                mutation_count += 1
+#        result.append(mutation_count)
+#    return result
 
 def ksearch(S,k,f,x):
     """
@@ -32,52 +45,56 @@ def ksearch(S,k,f,x):
 
     Discussion: Add analysis here
     """
+
 #------------------------------Part1.1--------------------------------------
 
     location = {}                          #location
-    test = {}
     k_mers = {}                            #List containing result above
     A = {}
     final = {}
+    test = []
 
     for i in range(len(S)-k+1):       #Looping through the initial string
-        k_mer = S[i:i+k]              #defining the k_mer
+        k_mer = S[i:i+k]
+        test.append(k_mer)              #defining the k_mer
         if k_mer not in k_mers:
             location[k_mer] = i       #Gives the location of each k_mer
-            test[i] = k_mer
             k_mers[k_mer] = 1
             A[k_mer] = [i]
+            if len(A[k_mer]) > f-1:
+                final[k_mer] = A[k_mer]
+
         else:
             location[k_mer] = i
             k_mers[k_mer] += 1
             A[k_mer].append(location.get(k_mer))
-
-    for i in range(len(S)-k+1):
-        k_mer = S[i:i+k]
-        if len(A[k_mer]) > f-1:
-            final[k_mer] = A[k_mer]
-
+            if len(A[k_mer]) > f-1:
+                final[k_mer] = A[k_mer]
 
 #------------------------------Part1.2-------------------------------------
 
     #The idea is as follows: I will now go through the dictionary of k-mers
     #remove the xth component from the k-mer, making the element a (k-1)-mer
     #and now we can deploy the same method used in part 1.1
-    freq_dict = []              #ammendable list of frequent k-mers
     all_kmers = []              #ammendable list of all k-mers
+    freq_dict = []
+
 
     for key, value in final.items():
         temp = key[:x] + key[x+1:]
         freq_dict.append(temp)
 
-    for key,value in k_mers.items():
-        temp = key[:x] + key[x+1:]
+
+    for str in test:
+        temp = str[:x] + str[x+1:]
         all_kmers.append(temp)
 
+    count  = []
+    for i in range(len(freq_dict)):
+        count.append(all_kmers.count(freq_dict[i]) - len(list(final.values())[i]))
 
-    L1,L2,L3=[final.keys()],[final.values()],[common_elements(freq_dict,all_kmers)]
-
-    return L1,L2,L3,k_mers
+    L1,L2,L3 = list(final.keys()),list(final.values()),count
+    return L1,L2,L3
 
 
 
