@@ -2,6 +2,21 @@
 Anas Lasri and CID:01209387
 """
 
+def bsearch(L,x):
+    #Set initial start and end indices for full list
+    istart = 0
+    iend = len(L) - 1
+
+    #Iterate and contract "active" portion of list
+    while istart <= iend:
+        imid = int(0.5*(istart+iend))
+        if x==L[imid]:
+            return imid
+        elif x < L[imid]:
+            iend = imid-1
+        else:
+            istart = imid + 1
+
 def nsearch(L,P,target):
     """Input:
     L: list containing *N* sub-lists of length M. Each sub-list
@@ -22,9 +37,23 @@ def nsearch(L,P,target):
     is not found in L, simply return an empty list (as in the code below)
     """
 
-    Lout=[]
+    #L is the list that has N sublists, So we start our search process by
+    #considering it first. Since we are using numpy we will have to loop
+    #through the sublists of L, *N*, one by one.
+    A = []
+    for idx,sublist in enumerate(L):
+        if L[idx][P] < target:
+            for i in range(P,len(L[idx])):
+                if L[idx][i] == target:
+                    A.append([idx,i])
+        elif L[idx][P] >= target:
+            for i in range(len(L[idx])):
+                if L[idx][i] == target:
+                    A.append([idx,i])
 
-    return Lout
+
+
+    return A
 
 
 def nsearch_time():
