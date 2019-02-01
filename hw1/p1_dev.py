@@ -96,17 +96,17 @@ def ksearch(S,k,f,x):
 def analyze(k,f,x):
     final_dt = []
     size = []
-    for  i in range(1000,20000,100):
+    for  i in range(100000,1000000,100000):
         dt = []
         size.append(i)
-        for j in range(20):
+        for j in range(10):
             t1 = time.time()
             dummy = ksearch(generate(i),k,f,x)
             t2 = time.time()
             dt.append(t2-t1)
         final_dt.append(sum(dt)/len(dt))
 
-    plt.plot(size[:],final_dt[:])
+    plt.plot(size[:],final_dt[:],'x--')
 
 if __name__=='__main__':
     #Sample input and function call. Use/modify if/as needed
