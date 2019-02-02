@@ -9,17 +9,6 @@ def generate(N):
     seq = ''.join(list(np.random.choice(nucleo,N)))
     return seq
 
-
-#def common_elements(list1,list2):
-#    result = []
-#    for i in list1:
-#        mutation_count = 0
-#        for j in list2:
-#            if j == i:
-#                mutation_count += 1
-#        result.append(mutation_count)
-#    return result
-
 def ksearch(S,k,f,x):
     """
     Search for frequently-occurring k-mers within a DNA sequence
