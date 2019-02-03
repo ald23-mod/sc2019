@@ -27,31 +27,46 @@ def ksearch(S,k,f,x):
     L2: list containing the locations of the frequent k-mers
     L3: list containing the number of point-x mutations for each k-mer in L1.
 
-    Discussion: Add analysis here
+    Discussion:
+    3.1) Concise description of my algorithm:
+    I start my algorithm by initializing the necessary dictionaries, these
+    dictionaries are the following:
+         -k_mers:This dictionary saves each k-mer as a key along with the values
+         being the number of occurences of such k-mer. Thus, for example a
+         k-mer that has occured 3 times will be in the dictionary under the
+         form ('k-mer': 3)
+         -A: This dictionary will have as the value of each k-mer all of its
+         positions if it does appear more than once in a list
+         -final: This is a dictionary with the most frequent k-mers along
+         all the locations in which they can be found
+    The algorithm is fairly simple and easy to understand as after I initialize
+    the lists I will be using I start by looping through the string of DNA
+    and considering every k-mer that arises by first assigning the k-mer to
+    list named test,
     """
 
 #------------------------------Part1.1--------------------------------------
 
-    location = {}                          #location
-    k_mers = {}                            #List containing result above
-    A = {}
-    final = {}
-    test = []
+#Initialization of Data Structures:------------------------
 
-    for i in range(len(S)-k+1):       #Looping through the initial string
-        k_mer = S[i:i+k]
-        test.append(k_mer)              #defining the k_mer
+    k_mers = {}                            #Dictionary containing the k-mers
+    A = {}                                 #Dictionary containing loc. for repeats
+    final = {}                             #Dictionary the final result, 1.1
+    test = []                              #List containing the k_mers
+
+#-----------------------------------------------------------
+
+    for i in range(len(S)-k+1):            #Looping through the initial string
+        k_mer = S[i:i+k]                   #defining the k_mer
+        test.append(k_mer)
         if k_mer not in k_mers:
-            location[k_mer] = i       #Gives the location of each k_mer
             k_mers[k_mer] = 1
             A[k_mer] = [i]
             if len(A[k_mer]) > f-1:
                 final[k_mer] = A[k_mer]
-
         else:
-            location[k_mer] = i
             k_mers[k_mer] += 1
-            A[k_mer].append(location.get(k_mer))
+            A[k_mer].append(i)
             if len(A[k_mer]) > f-1:
                 final[k_mer] = A[k_mer]
 
@@ -62,6 +77,7 @@ def ksearch(S,k,f,x):
     #and now we can deploy the same method used in part 1.1
     all_kmers = []              #ammendable list of all k-mers
     freq_dict = []
+    count  = []
 
 
     for key, value in final.items():
@@ -73,12 +89,11 @@ def ksearch(S,k,f,x):
         temp = str[:x] + str[x+1:]
         all_kmers.append(temp)
 
-    count  = []
     for i in range(len(freq_dict)):
         count.append(all_kmers.count(freq_dict[i]) - len(list(final.values())[i]))
 
     L1,L2,L3 = list(final.keys()),list(final.values()),count
-    return L1,L2,L3
+    return L1,L2,L3,final
 
 #-------------------------Part1.3/Analyze-----------------------------------
 #In this part I will produce plots.
@@ -96,6 +111,20 @@ def analyze(k,f,x):
         final_dt.append(sum(dt)/len(dt))
 
     plt.plot(size[:],final_dt[:],'x--')
+
+def analyze2(f,x):
+    final_dt = []
+    size = []
+    L = generate(100000)
+    for i in range(1,100000,5000):
+        dt = []
+        size.append(i)
+        t1 = time.time()
+        dummy = ksearch(L,i,f,x)
+        t2 = time.time()
+        dt.append(t2-t1)
+        final_dt.append(sum(dt)/len(dt))
+        plt.plot(size[:],final_dt[:],'x--')
 
 if __name__=='__main__':
     #Sample input and function call. Use/modify if/as needed
