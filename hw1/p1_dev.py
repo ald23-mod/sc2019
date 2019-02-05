@@ -54,77 +54,107 @@ def ksearch(S,k,f,x):
     final = {}                             #Dictionary the final result, 1.1
     test = []                              #List containing the k_mers
 
+    size = len(S)-k+1
+
 #-----------------------------------------------------------
 
-    for i in range(len(S)-k+1):            #Looping through the initial string
+    for i in range(size):            #Looping through the initial string
         k_mer = S[i:i+k]                   #defining the k_mer
         test.append(k_mer)
         if k_mer not in k_mers:
             k_mers[k_mer] = 1
             A[k_mer] = [i]
-            if len(A[k_mer]) > f-1:
+            if len(A[k_mer]) >= f:
                 final[k_mer] = A[k_mer]
         else:
             k_mers[k_mer] += 1
             A[k_mer].append(i)
-            if len(A[k_mer]) > f-1:
+            if len(A[k_mer]) >= f:
                 final[k_mer] = A[k_mer]
 
+    L1 = list(final.keys())
+    L2 = list(final.values())
 #------------------------------Part1.2-------------------------------------
 
     #The idea is as follows: I will now go through the dictionary of k-mers
     #remove the xth component from the k-mer, making the element a (k-1)-mer
     #and now we can deploy the same method used in part 1.1
-    all_kmers = []              #ammendable list of all k-mers
-    freq_dict = []
-    count  = []
+    L3 = []
+    var = {}
 
+    for i in range(size):
+        k_mer = S[i:i+x] + S[i+x+1:i+k]
+        if k_mer not in var:
+            var[k_mer] = 0
+        if k_mer in var:
+            var[k_mer] += 1
+    for i in range(len(L1)):
+        k_mer = L1[i][:x] + L1[i][x+1:]
+        if k_mer in var:
+            L3.append(var[k_mer] - len(L2[i]))
 
-    for key, value in final.items():
-        temp = key[:x] + key[x+1:]
-        freq_dict.append(temp)
-
-
-    for str in test:
-        temp = str[:x] + str[x+1:]
-        all_kmers.append(temp)
-
-    for i in range(len(freq_dict)):
-        count.append(all_kmers.count(freq_dict[i]) - len(list(final.values())[i]))
-
-    L1,L2,L3 = list(final.keys()),list(final.values()),count
-    return L1,L2,L3,final
+    return L1,L2,L3
 
 #-------------------------Part1.3/Analyze-----------------------------------
 #In this part I will produce plots.
-def analyze(k,f,x):
-    final_dt = []
-    size = []
-    for  i in range(100000,1000000,100000):
-        dt = []
-        size.append(i)
-        for j in range(10):
-            t1 = time.time()
-            dummy = ksearch(generate(i),k,f,x)
-            t2 = time.time()
-            dt.append(t2-t1)
-        final_dt.append(sum(dt)/len(dt))
+#def analyze(k,f,x):
+#    final_dt = []
+#    size = []
+#    for  i in range(2000,10000,100):
+#        dt = []
+#        size.append(i)
+#        for j in range(10):
+#            t1 = time.time()
+#            dummy = ksearch(generate(i),k,f,x)
+#            t2 = time.time()
+#            dt.append(t2-t1)
+#        final_dt.append(sum(dt)/len(dt))
+#
+#    plt.plot(size[:],final_dt[:],'x--')
+#
+#def analyze2(f,x):
+#    final_dt = []
+#    size = []
+#    L = generate(100000)
+#    for i in range(1,110000,5000):
+#        dt = []
+#        size.append(i)
+#        t1 = time.time()
+#        dummy = ksearch(L,i,f,x)
+#        t2 = time.time()
+#        dt.append(t2-t1)
+#        final_dt.append(sum(dt)/len(dt))
+#        plt.plot(size[:],final_dt[:],'x--')
+#
+#def analyze3(k,x):
+#    final_dt = []
+#    size = []
+#    L = generate(100000)
+#    for i in range(1,110000,5000):
+#        dt = []
+#        size.append(i)
+#        t1 = time.time()
+#        dummy = ksearch(L,k,i,x)
+#        t2 = time.time()
+#        dt.append(t2-t1)
+#        final_dt.append(sum(dt)/len(dt))
+#        plt.plot(size[:],final_dt[:],'x--')
+#
+#def analyze4(k,f):
+#    final_dt = []
+#    size = []
+#    L = generate(100000)
+#    for i in range(1,110000,5000):
+#        dt = []
+#        size.append(i)
+#        t1 = time.time()
+#        dummy = ksearch(L,k,f,i)
+#        t2 = time.time()
+#        dt.append(t2-t1)
+#        final_dt.append(sum(dt)/len(dt))
+#        plt.plot(size[:],final_dt[:],'x--')
 
-    plt.plot(size[:],final_dt[:],'x--')
 
-def analyze2(f,x):
-    final_dt = []
-    size = []
-    L = generate(100000)
-    for i in range(1,100000,5000):
-        dt = []
-        size.append(i)
-        t1 = time.time()
-        dummy = ksearch(L,i,f,x)
-        t2 = time.time()
-        dt.append(t2-t1)
-        final_dt.append(sum(dt)/len(dt))
-        plt.plot(size[:],final_dt[:],'x--')
 
 if __name__=='__main__':
     #Sample input and function call. Use/modify if/as needed
