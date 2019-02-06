@@ -3,83 +3,30 @@ Anas Lasri and CID:01209387
 """
 import numpy as np
 
-def isort(X):
-    """Sort X using insertion sort algorithm and return sorted array
-    """
-
-    S = X.copy()
-
-    for i,x in enumerate(X[1:],1):
-        #place x appropriately in partially sorted array, S
-        for j in range(i-1,-1,-1):
-            if S[j+1]<S[j]:
-                S[j],S[j+1] = S[j+1],S[j]
-            else:
-                break
-    return S
-
-def merge(L,R):
-    """Merge 2 sorted lists provided as input
-    into a single sorted list
-    """
-    M = [] #Merged list, initially empty
-    indL,indR = 0,0 #start indices
-    nL,nR = len(L),len(R)
-
-    #Add one element to M per iteration until an entire sublist
-    #has been added
-    for i in range(nL+nR):
-        if L[indL]<R[indR]:
-            M.append(L[indL])
-            indL = indL + 1
-            if indL>=nL:
-                M.extend(R[indR:])
-                break
-        else:
-            M.append(R[indR])
-            indR = indR + 1
-            if indR>=nR:
-                M.extend(L[indL:])
-                break
-    return M
-
-def mergesort(X):
-    """Given a unsorted list, sort list using
-    merge sort algorithm and return sorted list
-    """
-
-    n = len(X)
-
-    if n==1:
-        return X
-    else:
-        L = mergesort(X[:n//2])
-        R = mergesort(X[n//2:])
-        return merge(L,R)
 
 def generate2(N,M,P):
-    LIST = []
-    for n in range(N):
-        A = list(np.random.choice(range(10),M))
-        A[0:P] = mergesort(A[0:P])
-        LIST.append(A)
-    return(LIST)
+    """This is the function used to generate the randomized Initial
+    L which is the main input into our nsearch function
+    """
+    A = np.random.randint(100000, size = (N,M))
+    A[:,0:P] = np.sort(A[:,0:P])
+    return A
 
 #This is an edited version of the binary search in which it find the first
 #ocurrence  of the target. This will help with the implementation later on
 def bsearch(L,x):
-
+    """This is the edited binary search as described below. I edited the function
+    from the lectures to make it find the first instance of occurence of the
+    target and so being able to add a while loop to find all occurences of it.
+    """
     #Set initial start and end indices for full list
     istart = 0
     iend = len(L)-1
-
     #Iterate and contract "active" portion of list
     while istart<=iend:
-
         imid = int(0.5*(istart+iend))
-
         if x==L[imid]:
-            while L[imid] == L[imid-1]:
+            while L[imid] == L[imid-1]: #Modified part to find the first ocurrence
                 imid = imid - 1
             return imid
         elif x < L[imid]:
@@ -109,25 +56,22 @@ def nsearch(L,P,target):
     is not found in L, simply return an empty list (as in the code below)
     """
 
-    #L is the list that has N sublists, So we start our search process by
-    #considering it first. Since we are using numpy we will have to loop
-    #through the sublists of L, *N*, one by one.
-    A = []
-    for idx,sublist in enumerate(L):
-        if L[idx][P] < target:
+    A = []                                         #Initializing empty list
+    for idx,sublist in enumerate(L):               #Looping over list
+        if L[idx][P] < target:                     #Linear search
             for i in range(P,len(L[idx])):
-                if L[idx][i] == target:
-                    A.append([idx,i])
-        else:
+                if L[idx][i] == target:           #Check whether its target
+                    A.append([idx,i])             #Append to result list
+        else:                                     #binary search
             j = bsearch(L[idx][0:P],target)
             if j != -1000:
                 A.append([idx,j])
-                while L[idx][j] == L[idx][j+1] and j+1 < P:
+                while L[idx][j] == L[idx][j+1] and j+1 < P:  #Check for other target hits
                     j = j + 1
                     A.append([idx,j])
-            for id in range(P,len(L[idx])):
-                if L[idx][id] == target:
-                    A.append([idx,id])
+            for id in range(P,len(L[idx])):       #linear search
+                if L[idx][id] == target:          #Check whether its target
+                    A.append([idx,id])            #Append to result list
 
 
     return A
@@ -138,8 +82,56 @@ def nsearch_time():
     Add input/output as needed, add a call to this function below to generate
     the figures you are submitting with your codes.
 
-    Discussion: (add your discussion here)
+    Discussion:
+    2.a) I start my algorithm by looping thorugh the imput list L using
+    enumerate which can return to us the index along with the sublist to deal with.
+    I then inmediately introduce an if statement. This is done for the following reason:
+    I will first go to the last sorted in each sublist of L and check wheter that element
+    is less than the target, the reason for this is if said element is less than the
+    target then we now for a fact that our target will not lie within the first P
+    sorted elements and hence we can skip doing any search method on this part of
+    our sub-lists. If this is the case I simply perform linear search on the undordered
+    part of the sublist to find any matches with the target and add them to my result
+    list.
+    Let us now assume that the P'th element of the sublist is not less than the target,
+    what my code will do then is treat the sublist as two separate problems, performing
+    an edited version of binary search on the first half as it is ordered and then it
+    will simply perform linear search in the second unordered part of the sublist.
+    The last part to clarify about my algorithm is the binary search. The basic function
+    was copied from the one used in the lectures with minor tweaks. the tweaks are to
+    solve a minor issue which is the fact that binary search will only find one instance
+    of the target in our sublist, and hence if the target is repeated within the sorted part
+    it will not be able to identify the repeats. To solve this, the binary search
+    function is edited to find the first instance or ocurrence of our target in the
+    sorted sublist, and then from there within our main function we can add a while
+    statement that will be able to count over all the ocurrences.
+
+    2.b) As you can see from the algorithm we start with an enumerate loop of size N, where
+    N is the number of sublists inside L itself. I then introduce an if statement as
+    explained before. The best case scenario time-wise follows if the if statement is true, in
+    which case we only use linear search on the unsorted part of the sublist, this
+    as the name indicated is in linear order as we will need to loop through all the
+    elements.
+    Let us now consider the worst case for now which is when the algorithm has to
+    do both binary and linear search. We know the order of binary search is logarithm
+    of P in the base of 2 and since we already know from the previous part that linear
+    search has linear order in (M-P) which is the length of the unsorted sublist.
+
+    And hence we can say than in general the order of the function is:
+    N*(log_{2}P + M-P) and hence  big-O is O(N(M-P)). As I discussed before  in the best case
+    where we do not go through binary search we have order being N*(M-P). This is
+    while counting the order without caring for leading constants.
+
+    2.c) My algorithm can be considered as efficient because I first of all only consider
+    the sorted array if the condition mentioned above holds and hence I do not even
+    consider such part of the sublists which affects the time hugely. Secondly I
+    even when I consider the sorted part of the list I created an edited version of the
+    binary search that reduces the time and helps me to not employ linear search
+    throughout all of the sublists
     """
+
+    
+
 
 
 
