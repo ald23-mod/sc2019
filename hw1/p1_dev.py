@@ -28,21 +28,7 @@ def ksearch(S,k,f,x):
     L3: list containing the number of point-x mutations for each k-mer in L1.
 
     Discussion:
-    3.1) Concise description of my algorithm:
-    I start my algorithm by initializing the necessary dictionaries, these
-    dictionaries are the following:
-         -k_mers:This dictionary saves each k-mer as a key along with the values
-         being the number of occurences of such k-mer. Thus, for example a
-         k-mer that has occured 3 times will be in the dictionary under the
-         form ('k-mer': 3)
-         -A: This dictionary will have as the value of each k-mer all of its
-         positions if it does appear more than once in a list
-         -final: This is a dictionary with the most frequent k-mers along
-         all the locations in which they can be found
-    The algorithm is fairly simple and easy to understand as after I initialize
-    the lists I will be using I start by looping through the string of DNA
-    and considering every k-mer that arises by first assigning the k-mer to
-    list named test,
+
     """
 
 #------------------------------Part1.1--------------------------------------
@@ -52,15 +38,13 @@ def ksearch(S,k,f,x):
     k_mers = {}                            #Dictionary containing the k-mers
     A = {}                                 #Dictionary containing loc. for repeats
     final = {}                             #Dictionary the final result, 1.1
-    test = []                              #List containing the k_mers
 
-    size = len(S)-k+1
+    size = len(S)-k+1                      #Precalculating the size for the loops
 
 #-----------------------------------------------------------
 
-    for i in range(size):            #Looping through the initial string
-        k_mer = S[i:i+k]                   #defining the k_mer
-        test.append(k_mer)
+    for i in range(size):                 #Looping through the initial string
+        k_mer = S[i:i+k]                  #defining the k_mer at each iteration
         if k_mer not in k_mers:
             k_mers[k_mer] = 1
             A[k_mer] = [i]
