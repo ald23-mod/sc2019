@@ -2,6 +2,8 @@
 Anas Lasri and CID:01209387
 """
 import numpy as np
+import time
+import matplotlib.pyplot as plt
 
 
 def generate2(N,M,P):
@@ -128,11 +130,87 @@ def nsearch_time():
     even when I consider the sorted part of the list I created an edited version of the
     binary search that reduces the time and helps me to not employ linear search
     throughout all of the sublists
+
+    2.e) I will now comment on my plots and relate them to the results I discussed
+    theoretically. First I would like to say that for better time estimates I averaged
+    over 10 simulations in all the plots. Let us discuss the plots one by one:
+
+    fig1.png: To create this plot I changed the size of N in increasing order while
+    keeping both M and P constant. Following the time complexity analysis that I completed
+    this should have linear order as I said that the order nsearch follows the following
+    expression N*(log_{2}P + M-P). This is exactly what the plot outputs.
+
+    fig2.png: For this plot as you can see from the title of the plot I changed the M
+    while keeping everything else constant and following the same theoretical principles
+    from which we analysed the first plot this will also be linear in time and that
+    is exactly what we get.
+
+    fig3.png: For this plot I varied both N and M to find what would be the relation
+    betqeen both parameters. This relation can be deduced from the expresion N*(log_{2}P + M-P)
+    Since we will be varying M and N the important term will be N*(M-P) and since
+    both of them are increasing in our plot we will get  a quadratic shape plot as the
+    term N*M dictates.
     """
 
-    
+    timef,time1f, time2f = [],[],[]
+    actual_time, actual_time1, actual_time2 = [],[],[]
+    size, size1, size2 = [],[],[]
+
+    for i in range(1000,10000,250):
+        size.append(i)
+        for j in range(10):
+            L = generate2(i,100,50)
+            t1 = time.time()
+            nsearch(L,50,5)
+            t2 = time.time()
+            dt = t2 - t1
+            timef.append(dt)
+        actual_time.append(sum(timef)/len(timef))
+
+    for i in range(1000,2000,100):
+        N = 2000
+        size1.append(i)
+        for j in range(10):
+            L = generate2(N,i,i//2)
+            t1 = time.time()
+            nsearch(L,i//2,50)
+            t2 = time.time()
+            dt = t2 - t1
+            time1f.append(dt)
+        actual_time1.append(sum(time1f)/len(time1f))
+
+    for i in range(0,3000,250):
+        size2.append(i)
+        for j in range(10):
+            L = generate2(i,i//2,i//4)
+            t1 = time.time()
+            nsearch(L,i//4,50)
+            t2 = time.time()
+            dt = t2 - t1
+            time2f.append(dt)
+        actual_time2.append(sum(time2f)/len(time2f))
 
 
+    plt.figure()
+    plt.plot(size[:],actual_time[:])
+    plt.xlabel('Size of L')
+    plt.ylabel('Time')
+    plt.title('Anas Lasri, CID: 01209387 \n Plot varying the size of L')
+    plt.savefig('fig1.png',dpi=400)
+
+    plt.figure()
+    plt.plot(size1[:],actual_time1[:])
+    plt.xlabel('Size of M')
+    plt.ylabel('Time')
+    plt.title('Anas Lasri, CID: 01209387 \n Plot varying the size of M')
+    plt.savefig('fig2.png',dpi=400)
+
+    plt.figure()
+    plt.plot(size2[:],actual_time2[:])
+    plt.xlabel('Size of N')
+    plt.ylabel('Time')
+    plt.title('Anas Lasri, CID: 01209387 \n Plot varying the size of N and M')
+    plt.savefig('fig3.png',dpi=400)
 
 
     return None #Modify as needed
