@@ -1,10 +1,10 @@
-"""Dijsktra algorithm implemented using dictionaries.
+"""Dijkstra algorithm implemented using dictionaries.
 Note: Implementation is different from lecture 8 slides but similar
 to the in-class example.
 """
 import networkx as nx
 
-def dijstra(G,s):
+def dijkstra(G,s):
     """Find shortest distances to s in weighted graph, G"""
 
     #Initialize dictionaries
@@ -34,7 +34,7 @@ def dijstra(G,s):
                 if dcomp<Udict[n]:
                     Udict[n]=dcomp
 
-        return Edict
+    return Edict
 
 
 if __name__=='__main__':
@@ -42,3 +42,4 @@ if __name__=='__main__':
     e=[[1,2,3],[1,5,2],[2,3,1],[2,5,1],[5,4,5],[3,4,2],[4,6,1]]
     G = nx.Graph()
     G.add_weighted_edges_from(e)
+    Edict = dijkstra(G,1)
