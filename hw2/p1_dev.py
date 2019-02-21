@@ -1,5 +1,5 @@
 """M345SC Homework 2, part 1
-Your name and CID here
+Anas Lasri Doukkali, CID: 01209387
 """
 
 def scheduler(L):
@@ -13,17 +13,28 @@ def scheduler(L):
     sub-list indicates that task j must be completed before task i can be started.
 
     Output:
-    L: A list of integers corresponding to the schedule of tasks. L[i] indicates
+    S: A list of integers corresponding to the schedule of tasks. S[i] indicates
     the day on which task i should be carried out. Days are numbered starting
     from 0.
 
     Discussion: Add analysis here
     """
-
-
-    S=[] #Modify as needed
-
+    S= [0]*len(L)
+    day_counter = 0
+    task_status = [0] * len(L)
+    while sum(task_status) < len(L):
+        for i in range(len(L)):
+            if len(L[i]) == 0 and task_status[i] == 0:
+                task_status[i] = 1
+                S[i] = day_counter
+        for j in range(len(L)):
+            if task_status[j] == 1:
+                for j2 in range(len(L)):
+                    if j in L[j2]:
+                        L[j2].remove(j)
+        day_counter += 1
     return S
+
 
 
 def findPath(A,a0,amin,J1,J2):
@@ -53,9 +64,9 @@ def findPath(A,a0,amin,J1,J2):
     """
 
 
-    L=[] #Modify as needed
+    Z=[] #Modify as needed
 
-    return L
+    return Z
 
 
 def a0min(A,amin,J1,J2):
@@ -94,6 +105,6 @@ def a0min(A,amin,J1,J2):
     return output
 
 
-if __name__=='__main__':
+#if __name__=='__main__':
     #add code here if/as desired
-    L=None #modify as needed
+    #L=None #modify as needed
