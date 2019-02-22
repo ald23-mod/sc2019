@@ -1,6 +1,7 @@
 """M345SC Homework 2, part 1
 Anas Lasri Doukkali, CID: 01209387
 """
+import numpy as np
 
 def scheduler(L):
     """
@@ -36,7 +37,6 @@ def scheduler(L):
     return S
 
 
-
 def findPath(A,a0,amin,J1,J2):
     """
     Question 1.2 i)
@@ -63,10 +63,37 @@ def findPath(A,a0,amin,J1,J2):
     Discussion: Add analysis here
     """
 
+    L1 = list(np.arange(len(A)))      #Assumes nodes are numbered from 0 to N-1
+    L2 = [0 for l in L1]
+    L3 = [-1000 for l in L1]
+    L4 = [[] for l in L1] #paths
 
-    Z=[] #Modify as needed
 
-    return Z
+    Q=[]
+    Q.append(J1)
+    L2[J1]=1
+    L3[J1]=0
+    L4[J1]=[J1]
+    while len(Q)>0:
+        x = Q.pop(0) #remove node from front of queue
+        print("***x=",x,' ***')
+        for i in range(len(A[x])):
+            v = A[x][i][0]
+            if L2[v]==0 and a0*A[x][i][1] >= amin:
+                Q.append(v) #add unexplored neighbors to back of queue
+                L2[v]=1
+                L3[v]=1+L3[x]
+                L4[v].extend(L4[x]) #Add path to node x and node v to path
+                L4[v].append(v)     #for node v
+
+
+            print("v=",v)
+            print("Q=",Q)
+
+    L5 = L4[J2]
+
+    return L5
+
 
 
 def a0min(A,amin,J1,J2):
