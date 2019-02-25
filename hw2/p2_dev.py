@@ -28,9 +28,29 @@ def model1(G,x=0,params=(50,80,105,71,1,0),tf=6,Nt=400,display=False):
     S = np.zeros(Nt+1)
 
     #Add code here
+    x0 = [0.1,0.05,0.05]
+    x = odeint(infection,x0,tarray)
 
+    S = x[:,2]
 
+    plt.scatter(tarray,S)
+    plt.ylim(-0.005,0.07)
     return S
+
+def infection(x,t,params=(50,80,105,71,1,0)):
+    a,theta1,theta2,g,k,tau=params
+    v = x[0]
+    i = x[1]
+    s = x[2]
+
+    theta = theta1+theta2*(1-np.sin(2*np.pi*t))
+
+    didt = theta*s*v - (k + a)*i
+    dvdt = k*(1 - v) - theta*(s*v)
+    dsdt = a*i - (g + k)*s
+
+    return [dvdt,didt,dsdt]
+
 
 def modelN(G,x=0,params=(50,80,105,71,1,0.01),tf=6,Nt=400,display=False):
     """
