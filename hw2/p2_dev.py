@@ -29,6 +29,19 @@ def model1(G,x=0,params=(50,80,105,71,1,0),tf=6,Nt=400,display=False):
     S = np.zeros(Nt+1)
 
     #Add code here
+    def infection(x,t,params=(50,80,105,71,1,0)):
+        a,theta1,theta2,g,k,tau=params
+        v = x[0]
+        i = x[1]
+        s = x[2]
+
+        theta = theta1+theta2*(1-np.sin(2*np.pi*t))
+
+        dvdt = k*(1 - v) - theta*(s*v)
+        didt = theta*s*v - (k + a)*i
+        dsdt = a*i - (g + k)*s
+
+        return [dvdt,didt,dsdt]
     x0 = [0.1,0.05,0.05]
     x = odeint(infection,x0,tarray)
 
@@ -38,19 +51,6 @@ def model1(G,x=0,params=(50,80,105,71,1,0),tf=6,Nt=400,display=False):
     plt.ylim(-0.005,0.07)
     return S
 
-def infection(x,t,params=(50,80,105,71,1,0)):
-    a,theta1,theta2,g,k,tau=params
-    v = x[0]
-    i = x[1]
-    s = x[2]
-
-    theta = theta1+theta2*(1-np.sin(2*np.pi*t))
-
-    dvdt = k*(1 - v) - theta*(s*v)
-    didt = theta*s*v - (k + a)*i
-    dsdt = a*i - (g + k)*s
-
-    return [dvdt,didt,dsdt]
 
 
 def modelN(G,x=0,params=(50,80,105,71,1,0.01),tf=6,Nt=400,display=False):
@@ -75,9 +75,6 @@ def modelN(G,x=0,params=(50,80,105,71,1,0.01),tf=6,Nt=400,display=False):
     Smean = np.zeros(Nt+1)
     Svar = np.zeros(Nt+1)
     N = nx.number_of_nodes(G)           # Defining number of nodes
-    #x0_a = [0.1,0.05,0.05]
-    #x0_b = [1,0,0]*(N - 1)
-    #y = x0_a + x0_b
     y_S = np.zeros(N)
     y_I = np.zeros(N)
     y_V = np.ones(N)
@@ -86,29 +83,23 @@ def modelN(G,x=0,params=(50,80,105,71,1,0.01),tf=6,Nt=400,display=False):
     y_V[x] = 0.1
 
     z = np.concatenate([y_S,y_I])
-    y = np.concatenate([z,y_V])
-
-
-
-    print(y.shape)
-    #y = [0.05] + [0] * 99 + [0.05] + [0] * 99 + [0.1] + [1] * 99
-
-    #[0.05,0.05,0.1] or [0,0,1]
-
-    #y = [0.05] + [0] * 99 + [0.05] + [0] * 99 + [0.1] + [1] * 99
-
+    y0 = np.concatenate([z,y_V])
+    #print(y0)
 
 
     #-------------------- Defining the adjacency matrix --------------------
     A = nx.adjacency_matrix(G).toarray()
     q_i = np.array(A.sum(axis=0))
-    sum_kj = np.array(np.dot(q_i,A))
-    flux_ij = np.array(tau*np.divide((np.multiply(q_i,A)),(sum_kj)))
+    q_im = np.array([q_i,]*N).T
+    sum_kj = np.dot(q_i,A)
+    sum_kjm = np.array([sum_kj,]*N).T
+    flux_ij = np.array(tau*np.divide(np.multiply(q_im,A),sum_kjm))
+    flux_ij[np.isnan(flux_ij)] = 0
+    #print(tau*np.multiply(q_im,A))
+    #print(sum_kjm)
+    #print(flux_ij)
 
 
-    #S = np.array(y[:N])
-    #I = np.array(y[N:2*N])
-    #V = np.array(y[2*N:3*N])
 
     def RHS(y,t):
         """Compute RHS of model at time t
@@ -120,34 +111,40 @@ def modelN(G,x=0,params=(50,80,105,71,1,0.01),tf=6,Nt=400,display=False):
 
         Discussion: add discussion here
         """
-        a,theta0,theta1,g,k,tau=params      # Input parameters
+        #a,theta0,theta1,g,k,tau=params      # Input parameters
         #N = nx.number_of_nodes(G)           # Defining number of nodes
         S = np.array(y[:N])
         I = np.array(y[N:2*N])
         V = np.array(y[2*N:3*N])
         dy = np.zeros(3*N)                  # Initializing dy
+        print(I)
 
         theta = theta0 + theta1*(1 - np.sin(2*np.pi*t))
 
 
-        dy[:N] = a*I - (g + k)*S + np.dot(np.array(flux_ij.sum(axis=0)),S) - np.multiply(np.array(flux_ij.sum(axis=0)),S)
-        dy[N:2*N] = theta*np.multiply(S,V) - (k + a)*I + np.dot(np.array(flux_ij.sum(axis=0)),I) - np.multiply(np.array(flux_ij.sum(axis=0)),I)
-        dy[2*N:3*N] = k - k*V - theta*np.multiply(S,V) + np.dot(np.array(flux_ij.sum(axis=0)),V) - np.multiply(np.array(flux_ij.sum(axis=0)),V)
+
+
+        dy[:N] = a*I - (g + k)*S + np.dot(flux_ij,S) - np.multiply(np.array(flux_ij.sum(axis=0)),S)
+        dy[N:2*N] = theta*np.multiply(S,V) - (k + a)*I + np.dot(flux_ij,I) - np.multiply(np.array(flux_ij.sum(axis=0)),I)
+        dy[2*N:3*N] = k - k*V - theta*np.multiply(S,V)  + np.dot(flux_ij,V) - np.multiply(np.array(flux_ij.sum(axis=0)),V)
 
 
         return dy
 
-    S_a = odeint(RHS,y,tarray)
-
-    S = S_a[:,:N]
+    y = odeint(RHS,y0,tarray)
+    S = y[:,:N]
 
     Smean = np.mean(S,axis=1)
-
     plt.scatter(tarray,Smean)
 
+    Svar = np.var(S,axis=1)
+    plt.scatter(tarray,Svar)
+    plt.ylim(0,max(Smean))
 
 
-    return Smean
+
+
+    return
 
 
 def diffusion(input=(None)):
