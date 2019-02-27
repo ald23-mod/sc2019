@@ -89,12 +89,15 @@ def modelN(G,x=0,params=(50,80,105,71,1,0.01),tf=6,Nt=400,display=False):
 
     #-------------------- Defining the adjacency matrix --------------------
     A = nx.adjacency_matrix(G).toarray()
+    print(A)
     q_i = np.array(A.sum(axis=0))
     q_im = np.array([q_i,]*N).T
     sum_kj = np.dot(q_i,A)
-    sum_kjm = np.array([sum_kj,]*N).T
-    flux_ij = np.array(tau*np.divide(np.multiply(q_im,A),sum_kjm))
+    #sum_kjm = np.array([sum_kj,]*N).T
+    flux_ij = np.array(tau*np.divide(np.multiply(q_im,A),sum_kj))
     flux_ij[np.isnan(flux_ij)] = 0
+    print(flux_ij)
+    print(sum_kj)
     #print(tau*np.multiply(q_im,A))
     #print(sum_kjm)
     #print(flux_ij)
@@ -117,7 +120,6 @@ def modelN(G,x=0,params=(50,80,105,71,1,0.01),tf=6,Nt=400,display=False):
         I = np.array(y[N:2*N])
         V = np.array(y[2*N:3*N])
         dy = np.zeros(3*N)                  # Initializing dy
-        print(I)
 
         theta = theta0 + theta1*(1 - np.sin(2*np.pi*t))
 
@@ -133,18 +135,31 @@ def modelN(G,x=0,params=(50,80,105,71,1,0.01),tf=6,Nt=400,display=False):
 
     y = odeint(RHS,y0,tarray)
     S = y[:,:N]
-
     Smean = np.mean(S,axis=1)
-    plt.scatter(tarray,Smean)
-
     Svar = np.var(S,axis=1)
-    plt.scatter(tarray,Svar)
-    plt.ylim(0,max(Smean))
+
+    plt.figure()
+    plt.scatter(tarray,Smean,s=10,c='blue')
+    plt.ylim(0,1.15*max(Smean))
+    plt.xlabel('t')
+    plt.ylabel('<S(t)>')
+    plt.title('Anas Lasri, mean of S(t)')
+    plt.savefig('CW2p1.png', dpi = 500)
+
+
+    plt.figure()
+    plt.scatter(tarray,Svar,s=10,c='magenta')
+    plt.ylim(0,1.15*max(Svar))
+    plt.xlabel('t')
+    plt.ylabel('$<(S(t)-<S(t)>)^2>$')
+    plt.title('Anas Lasri, variance of S(t)')
+    plt.savefig('CW2p2.png', dpi = 500)
 
 
 
 
-    return
+
+    return #Smean, Svar
 
 
 def diffusion(input=(None)):

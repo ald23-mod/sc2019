@@ -8,9 +8,9 @@ def dijkstra(G,s):
     """Find shortest distances to s in weighted graph, G"""
 
     #Initialize dictionaries
-    dinit = 10**6
+    dinit = 10**6                        #(-1 in our case)
     Edict = {} #Explored nodes
-    Udict = {} #Uneplroed nodes
+    Udict = {} #Unexplroed nodes
 
     for n in G.nodes():
         Udict[n] = dinit
@@ -21,7 +21,7 @@ def dijkstra(G,s):
         #Find node with min d in Udict and move to Edict
         dmin = dinit
         for n,w in Udict.items():
-            if w<dmin:
+            if w<dmin:                    #(w>dmin)
                 dmin=w
                 nmin=n
         Edict[nmin] = Udict.pop(nmin)
@@ -29,8 +29,8 @@ def dijkstra(G,s):
 
         #Update provisional distances for unexplored neighbors of nmin
         for n,w in G.adj[nmin].items():
-            if n in Udict:
-                dcomp = dmin + w['weight']
+            if n in Udict:                     #minimum of each path then the maximum of all of that
+                dcomp = w['weight']
                 if dcomp<Udict[n]:
                     Udict[n]=dcomp
 
