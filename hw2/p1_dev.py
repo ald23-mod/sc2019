@@ -1,13 +1,15 @@
 """M345SC Homework 2, part 1
 Anas Lasri Doukkali, CID: 01209387
 """
-
+#==============================================================================#
 #==============================PART 1==========================================#
-
+#==============================================================================#
 
 import numpy as np                                #Importing Numpy
 
+#------------------------------------------------------------------------------#
 #-----------------------------PART 1.1-----------------------------------------#
+#------------------------------------------------------------------------------#
 
 def scheduler(L):
     """
@@ -36,7 +38,30 @@ def scheduler(L):
     all tasks are completed which we keep track of using our task_status list.
 
     b) Time Complexity: I will now discuss the time complexity of my code and its
-    asymptotic behaviour.
+    asymptotic behaviour. We can see we straight away that our code depends heavily
+    on "len(L)", hence, all the loops we have in our code run through this length
+    making it thus our N. We start by initializing the day count which is constant
+    time, the initialization we will need to take into account is the one for the
+    zeros matrices which is done for both S and task_status. This is tricky to estimate
+    as it will depend on the computer architecture. For computers with lower Cache(L1, L2...)
+    storage there will be abrupt jumps as the matrices will need to be stored in the
+    bigger sized memories which are normaly further away from the arithmetic units.
+    This will however not affect our leading order or time complexity analysis as we
+    will be dealing with higher orders. We start with a while loop, the order for this
+    while loop depends on heavily on the structure of the input and will be mainly
+    carachterized by the longest dependency chain, hence, if we get a list in which the
+    number of tasks with an empty dependency list far exceeds the number of tasks that
+    have a non-empty dependency list we then consider that our largest dependency list,
+    call it D will be D<<N, however the worst case will be when the longest dependency list
+    is approximately N, taking into account that the maximum it could be is N-1.
+    Now, inside this while loop we have two separate for loops.
+    In the first for loop, which has order N we simply include an if statement which then
+    only execute simple tasks if they happen to be true, hence this will not affect the
+    leading order or time complexity. The second for loop however has a nested for loop
+    which comes from an if statement, hence this for loop will not be excecuted always
+    however as we will be considering the worst case scenario we can say that with this
+    final for loop our code can have a leading order of O(N^3), however this will not be the
+    case regularly as we have if statement that amotisize our time complexity.
     """
     S = np.zeros(len(L))                         # Initializing empty S array
     day_counter = 0                              # Day counter used to update S
@@ -54,7 +79,9 @@ def scheduler(L):
         day_counter += 1                         # Update the day count
     return S                                     # Return the schedule
 
+#------------------------------------------------------------------------------#
 #-------------------------------Part 1.2.1-------------------------------------#
+#------------------------------------------------------------------------------#
 
 def findPath(A,a0,amin,J1,J2):
     """
@@ -79,7 +106,36 @@ def findPath(A,a0,amin,J1,J2):
     Output:
     L: A list of integers corresponding to a feasible path from J1 to J2.
 
-    Discussion: Add analysis here
+    Discussion: I will first discuss the implementation and the idea behind the
+    algorithm before moving on to analyzing the time complexity of the code itself.
+
+    a) Implementation: The approach taken for this part of the coursework was the use of a modified
+    bfs or dfs to be able to find any feasable path and then print said path. The
+    code below will be for bfs however this can easily be modified for dfs by modifying
+    the pop argument to be empty. The way this works is as described in lectures.
+    We start as always by initialization of some needed lists. L1 will be a list of the nodes,
+    while L2 will be a list used to denote whether the nodes have been visited or no.
+    Hence if the node i is unvisited then L2[i]=0 and otherwise 1. L4 on the other hand will
+    contain the paths which we will be saving as we go along.
+    As I mentioned earlier, this code is similar to the one provided in the folder "codes"
+    and was only changed for two reasons. The one in lectures uses networkx and we now
+    have to write a code that does not. The second reason is that the code from lectures
+    only gives us the shortest distance to the destination node. While what we need is the
+    path itself. This was easily done by recalling Lab4 where we actually implemented a
+    solution to such problem. I choose breadth first search as it is the one that will
+    find the shortest path which dfs does not. This in our case was not particularly helpful
+    as we were only asked to find a "feasible" path, this is however worth mentioning.
+
+    b) Time Complexity: the code only contains two loops. An initial while loop with
+    a nested for loop inside. The while loop runs until our queue is empty. We will now
+    again need to consider the worst case scenario for this which is when we will have to visit
+    all the nodes that we have. Let us say this is order N. All the operation until the
+    while loop will not be relevant when taking N large, and hence we will not take them into
+    account. Inside this while loop now we have as we said earlier a for loop in which in the
+    best case we only execute one operation or in the worst case run four. This loop however
+    will do the number of operations mentioned above for all the neighbours of whichever
+    node the algorithm is considering at that point in time and hence we can safely assume that
+    it will  
     """
 
     L1 = list(np.arange(len(A)))                # Assumes nodes are numbered from 0 to N-1
@@ -98,16 +154,17 @@ def findPath(A,a0,amin,J1,J2):
             if L2[v]==0 and a0*A[x][i][1] >= amin: # Condition from signal traffic
                 Q.append(v)                     # Add unexplored neighbors to back of queue
                 L2[v]=1
-                #L3[v]=1+L3[x]
                 L4[v].extend(L4[x])             # Add path to node x and node v to path
                 L4[v].append(v)
             print("v=",v)
             print("Q=",Q)
-    L5 = L4[J2]                                 # Printing the correct path
+    L5 = L4[J2]                                 # Printing the feasable path found
 
     return L5
 
+#------------------------------------------------------------------------------#
 #--------------------------------Part 1.2.2------------------------------------#
+#------------------------------------------------------------------------------#
 
 def a0min(A,amin,J1,J2):
     """
@@ -145,15 +202,15 @@ def a0min(A,amin,J1,J2):
     Udict = {}                                # Unexplored nodes dict
 
     for n in range(len(A)):
-        Udict[n] = dinit
-    Udict[J1] = 0
+        Udict[n] = dinit                      # Initializing distance as -1
+    Udict[J1] = 0                             # Distance to source is 0
 
     #Main Search
-    while len(Udict) > 0:
+    while len(Udict) > 0:                     # While there are unexplored nodes
         #Find node with min d in Udict and move to Edict
-        dmin  = dinit
-        for n,w in Udict.items():
-            if w > dmin:
+        dmin  = dinit                         # Setting minimum distance to intial one
+        for n,w in Udict.items():             # Looping through the unexplored dictionary
+            if w > dmin:                      # If the weight of certain n
                 dmin = w
                 nmin = n
         Edict[nmin] = Udict.pop(nmin)
@@ -181,8 +238,6 @@ def a0min(A,amin,J1,J2):
 
 
     return output
-
-
 
 
 #if __name__=='__main__':
