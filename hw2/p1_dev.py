@@ -61,7 +61,7 @@ def scheduler(L):
     which comes from an if statement, hence this for loop will not be excecuted always
     however as we will be considering the worst case scenario we can say that with this
     final for loop our code can have a leading order of O(N^3), however this will not be the
-    case regularly as we have if statement that amotisize our time complexity.
+    case regularly as we have if statement that amortisize our time complexity.
     """
     S = np.zeros(len(L))                         # Initializing empty S array
     day_counter = 0                              # Day counter used to update S
@@ -124,7 +124,11 @@ def findPath(A,a0,amin,J1,J2):
     path itself. This was easily done by recalling Lab4 where we actually implemented a
     solution to such problem. I choose breadth first search as it is the one that will
     find the shortest path which dfs does not. This in our case was not particularly helpful
-    as we were only asked to find a "feasible" path, this is however worth mentioning.
+    as we were only asked to find a "feasible" path, this is however worth mentioning. ONe
+    more addition to the bfs algorithm provided was the condition check in which we now check
+    whether the node has enough signal left to be able to make it to the next junction on top
+    of whether it was marked as visited or not previously. This is quite important as it eliminates
+    all the path in which the signal reaches below minimal levels and hence does not make it across.
 
     b) Time Complexity: the code only contains two loops. An initial while loop with
     a nested for loop inside. The while loop runs until our queue is empty. We will now
@@ -135,7 +139,11 @@ def findPath(A,a0,amin,J1,J2):
     best case we only execute one operation or in the worst case run four. This loop however
     will do the number of operations mentioned above for all the neighbours of whichever
     node the algorithm is considering at that point in time and hence we can safely assume that
-    it will  
+    it will be of orfer approximatly close to the average degree number , however in the worst case
+    where we have that all nodes are connected to each other directly then the order will be N again.
+    We can now say that in a worst case scenario our algorithm will have a leading order of O(N^2),
+    while it is also safe to assume that if we denote M as being the average degree then,
+    the leading order in that case will be O(N*M).
     """
 
     L1 = list(np.arange(len(A)))                # Assumes nodes are numbered from 0 to N-1
@@ -148,7 +156,7 @@ def findPath(A,a0,amin,J1,J2):
     L4[J1]=[J1]                                 # Path for source
     while len(Q)>0:                             # Stopping algorithm once queue is empty
         x = Q.pop(0)                            # Remove node from front of queue
-        print("***x=",x,' ***')
+        #print("***x=",x,' ***')
         for i in range(len(A[x])):              # Loop through the adjacency matrix
             v = A[x][i][0]                      # Get the first element of the tuples(node)
             if L2[v]==0 and a0*A[x][i][1] >= amin: # Condition from signal traffic
@@ -156,8 +164,8 @@ def findPath(A,a0,amin,J1,J2):
                 L2[v]=1
                 L4[v].extend(L4[x])             # Add path to node x and node v to path
                 L4[v].append(v)
-            print("v=",v)
-            print("Q=",Q)
+            #print("v=",v)
+            #print("Q=",Q)
     L5 = L4[J2]                                 # Printing the feasable path found
 
     return L5
@@ -193,53 +201,69 @@ def a0min(A,amin,J1,J2):
     a0=a0min
     If no feasible path exists for any a0, return output as shown below.
 
-    Discussion: Add analysis here
+    Discussion: I will first discuss the implementation and the idea behind the
+    algorithm before moving on to analyzing the time complexity of the code itself.
+
+    a) Implementation:
+
+
+
+
+
+
+
+
+    b) Time complexity
     """
 
-    #Initialize dictionaries
-    dinit = -1                                # Initial "distance" value
-    Edict = {}                                # Explored nodes dict
-    Udict = {}                                # Unexplored nodes dict
+    #----------------------Initialize dictionaries-----------------------------#
+
+    a_init = -1                                 # Initial a value
+    Edict = {}                                  # Explored nodes dict
+    Udict = {}                                  # Unexplored nodes dict
 
     for n in range(len(A)):
-        Udict[n] = dinit                      # Initializing distance as -1
-    Udict[J1] = 0                             # Distance to source is 0
+        Udict[n] = a_init                       # Initializing a as -1
+    Udict[J1] = 0                               # a needed to source is 0
 
-    #Main Search
-    while len(Udict) > 0:                     # While there are unexplored nodes
-        #Find node with min d in Udict and move to Edict
-        dmin  = dinit                         # Setting minimum distance to intial one
-        for n,w in Udict.items():             # Looping through the unexplored dictionary
-            if w > dmin:                      # If the weight of certain n
-                dmin = w
-                nmin = n
-        Edict[nmin] = Udict.pop(nmin)
-        print("moved node", nmin)
+    #-----------------------------Main Search----------------------------------#
 
-        # Update provisional distances for unexplored neighbours of nmin
-        dcomp = 0
-        for i in range(len(A[nmin])):
-            n = A[nmin][i][0]
-            w = A[nmin][i][1]
+    while len(Udict) > 0:                       # While there are unexplored nodes
+        #Find node with max a in Udict and move to Edict
+        a_max  = a_init                         # Setting maximum a to intial one for starting value
+        for n,w in Udict.items():               # Looping through the unexplored dictionary
+            if w > a_max:                       # If the weight node is greater than current a_max
+                a_max = w                       # Update a_max
+                n_max = n                       # Keep track of node where this occurs
+        Edict[n_max] = Udict.pop(n_max)         # Mark such node as visited
+        #print("moved node", n_max)
+
+        # Update provisional a's for unexplored neighbours of n_max
+        a_comp = 0
+        for i in range(len(A[n_max])):          # Looping through nodes and their associated weights
+            n = A[n_max][i][0]                  # Defining node
+            w = A[n_max][i][1]                  # Defining associated value a of the node
             if n in Udict:
-                if dcomp < w:
-                    dcomp = w
-                if dcomp < Udict[n] or Udict[n] == -1:
-                    Udict[n] = dcomp
+                if a_comp < w:
+                    a_comp = w
+                if a_comp < Udict[n] or Udict[n] == -1: #Update
+                    Udict[n] = a_comp
 
-    a0_min = amin/Edict[J2]
+    if Edict[J2] != 0 :
+        a0_min = amin/Edict[J2]
 
-    path = findPath(A,amin/Edict[J2],amin,J1,J2)
+        path = findPath(A,a0_min,amin,J1,J2)
 
-    output = a0_min, path
+        output = a0_min, path
 
-    if len(path) == 0:
+        if len(path) == 0:
+            output = -1,[]
+    else:
         output = -1,[]
 
+    return output,Edict
 
-    return output
-
-
+#-----------------------------Main not used------------------------------------#
 #if __name__=='__main__':
     #add code here if/as desired
     #L=None #modify as needed
