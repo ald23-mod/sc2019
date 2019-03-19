@@ -1,5 +1,5 @@
 """M345SC Homework 3, part 2
-Your name and CID here
+Anas Lasri Doukkali, CID:01209387
 """
 import numpy as np
 import networkx as nx
