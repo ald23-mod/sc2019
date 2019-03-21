@@ -102,7 +102,7 @@ def wavediff(alpha,a,b,c,beta=0):
     h = x[1] - x[0]
 
     k = 2*np.pi*4/100
-    g = np.sin(k*x)
+    #g = np.sin(k*x)
 
     hfac = 1/h
     hfac_2 = 1/(2*h)
@@ -143,13 +143,11 @@ def wavediff(alpha,a,b,c,beta=0):
     third_row[Nx-1] = 0
     third_row[Nx-2] = 3
     A = np.asarray([first_row,second_row,third_row])
-
-
     dg = scipy.linalg.solve_banded((1,1),A,db)
 
-    plt.figure()
-    plt.plot(x, k*np.cos(k*x))
 
+    plt.figure()
+    #plt.plot(x, k*np.cos(k*x))
     plt.plot(x, dg)
     plt.show()
 
